@@ -7,10 +7,10 @@ import (
 )
 
 type Card struct {
-	hand             string
-	handListUnsorted []string
-	handListSorted   []string
-	frequenciesMap   map[string]int
+	hand     string
+	handList []string
+	freqMap  map[string]int
+	freqKeys []string
 }
 
 type Game struct {
@@ -24,23 +24,8 @@ type GameType struct {
 	points int // just a reference, strongest hand means more points
 }
 
-func createGameTypeSet() map[string]GameType {
-	var gameTypesList = []GameType{
-		{"five of a kind", 100},
-		{"four of a kind", 90},
-		{"full house", 80},
-		{"three of a kind", 70},
-		{"two pair", 60},
-		{"one pair", 50},
-		{"high card", 40},
-	}
-
-	var gameTypesMap = make(map[string]GameType)
-	for _, gameType := range gameTypesList {
-		gameTypesMap[gameType.name] = gameType
-	}
-	return gameTypesMap
-}
+var gCardSet = createCardSet()
+var gGameTypeSet = createGameTypeSet()
 
 func createCardSet() map[string]int {
 	return map[string]int{
@@ -60,25 +45,41 @@ func createCardSet() map[string]int {
 	}
 }
 
+func createGameTypeSet() map[string]GameType {
+	var gameTypes = []GameType{
+		{"five of a kind", 100},
+		{"four of a kind", 90},
+		{"full house", 80},
+		{"three of a kind", 70},
+		{"two pair", 60},
+		{"one pair", 50},
+		{"high card", 40},
+	}
+
+	var gameTypesMap = make(map[string]GameType)
+	for _, gameType := range gameTypes {
+		gameTypesMap[gameType.name] = gameType
+	}
+	return gameTypesMap
+}
+
 func readGames(lines []string) []Game {
-	var gamesTypesSet = createGameTypeSet()
 	var games = make([]Game, 0)
 	for _, line := range lines {
-
 		var hand = Trim(Split(line, " ")[0])
-		var handAsList = Split(hand, "")
 		var bind = ParseInt(Split(line, " ")[1])
-		var frequenciesList, frequenciesMap = Frequencies(handAsList)
+		var handList = Split(hand, "")
+		var freqMap, freqKeys = Frequencies(handList, false)
 
 		games = append(games, Game{
 			card: Card{
-				hand:             hand,
-				handListUnsorted: handAsList,
-				handListSorted:   frequenciesList,
-				frequenciesMap:   frequenciesMap,
+				hand:     hand,
+				handList: handList,
+				freqMap:  freqMap,
+				freqKeys: freqKeys,
 			},
 			bind:     bind,
-			gameType: gamesTypesSet["high card"], // by default the lowest
+			gameType: gGameTypeSet["high card"], // by default the lowest
 		})
 	}
 
@@ -86,19 +87,16 @@ func readGames(lines []string) []Game {
 }
 
 func sortFrequencies(game *Game) {
-	// update list of hands in order of frequencies
-	var handListSorted = game.card.handListSorted
-	var freqMap = game.card.frequenciesMap
+	var freqMap = game.card.freqMap
+	var freqKeys = game.card.freqKeys
 
-	// we need the card set because "K" is better than "2"
-	// and we want to consider that in the sorting when cards has the same frequency
-	var cardSet = createCardSet()
-
-	sort.SliceStable(handListSorted, func(i, j int) bool {
-		if freqMap[handListSorted[i]] == freqMap[handListSorted[j]] {
-			return cardSet[handListSorted[i]] > cardSet[handListSorted[j]]
+	// update freqKeys order, using frequency matches first, then card label value
+	// example: if we found 2 cards with same label, we need to validate the label since "K" is better than "2"
+	sort.SliceStable(freqKeys, func(i, j int) bool {
+		if freqMap[freqKeys[i]] == freqMap[freqKeys[j]] {
+			return gCardSet[freqKeys[i]] > gCardSet[freqKeys[j]]
 		} else {
-			return freqMap[handListSorted[i]] > freqMap[handListSorted[j]]
+			return freqMap[freqKeys[i]] > freqMap[freqKeys[j]]
 		}
 	})
 }
@@ -109,8 +107,8 @@ func hasFrequencyOf(game *Game, n int) bool {
 
 func countMatchesFrequencyOf(game *Game, n int) int {
 	var count = 0
-	var freqMap = game.card.frequenciesMap
-	for _, hand := range game.card.handListSorted {
+	var freqMap = game.card.freqMap
+	for _, hand := range game.card.freqKeys {
 		if freqMap[hand] == n {
 			count++
 		}
@@ -119,51 +117,47 @@ func countMatchesFrequencyOf(game *Game, n int) int {
 }
 
 func calculateGameType(game *Game) {
-	var gamesTypesSet = createGameTypeSet()
-
 	if hasFrequencyOf(game, 5) {
-		game.gameType = gamesTypesSet["five of a kind"]
+		game.gameType = gGameTypeSet["five of a kind"]
 		return
 	}
 
 	if hasFrequencyOf(game, 4) {
-		game.gameType = gamesTypesSet["four of a kind"]
+		game.gameType = gGameTypeSet["four of a kind"]
 		return
 	}
 
 	if hasFrequencyOf(game, 3) && hasFrequencyOf(game, 2) {
-		game.gameType = gamesTypesSet["full house"]
+		game.gameType = gGameTypeSet["full house"]
 		return
 	}
 
 	if hasFrequencyOf(game, 3) {
-		game.gameType = gamesTypesSet["three of a kind"]
+		game.gameType = gGameTypeSet["three of a kind"]
 		return
 	}
 
 	if countMatchesFrequencyOf(game, 2) >= 2 {
-		game.gameType = gamesTypesSet["two pair"]
+		game.gameType = gGameTypeSet["two pair"]
 		return
 	}
 
 	if hasFrequencyOf(game, 2) {
-		game.gameType = gamesTypesSet["one pair"]
+		game.gameType = gGameTypeSet["one pair"]
 		return
 	}
 	// it is already "high card"  by default
 }
 
 func sortByRank(games []Game) {
-	var cardSet = createCardSet()
-
 	// rank is the order of the list of games: first consider the type of hand, then the highest label
 	sort.SliceStable(games, func(i, j int) bool {
 		if games[i].gameType.points == games[j].gameType.points {
-			for k, _ := range games[i].card.handListUnsorted {
-				if cardSet[games[i].card.handListUnsorted[k]] == cardSet[games[j].card.handListUnsorted[k]] {
+			for k, _ := range games[i].card.handList {
+				if gCardSet[games[i].card.handList[k]] == gCardSet[games[j].card.handList[k]] {
 					continue
 				}
-				return cardSet[games[i].card.handListUnsorted[k]] < cardSet[games[j].card.handListUnsorted[k]]
+				return gCardSet[games[i].card.handList[k]] < gCardSet[games[j].card.handList[k]]
 			}
 			return true // doesn't matter
 		} else {
@@ -194,7 +188,7 @@ func solutionPart01(lines []string) {
 	// the rank is the index (is sorted by rank)
 	var sum = 0
 	for i, game := range games {
-		fmt.Printf("RANK %d, HAND: %s, TYPE: %s\n", i+1, game.card.hand, game.gameType.name)
+		// fmt.Printf("RANK %d, HAND: %s, TYPE: %s\n", i+1, game.card.hand, game.gameType.name)
 		sum += (i + 1) * game.bind
 	}
 
