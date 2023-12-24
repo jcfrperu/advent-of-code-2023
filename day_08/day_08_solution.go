@@ -95,7 +95,7 @@ func solutionPart02(lines []string) {
 
 	var result = 1
 	for _, count := range counts {
-		result = LCMInt(result, count)
+		result = LCM[int](result, count)
 	}
 	fmt.Printf("%d", result)
 }

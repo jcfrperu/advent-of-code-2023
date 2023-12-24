@@ -142,12 +142,6 @@ func nextCellByDir(field [][]Cell, cell Cell, rowDir int, colDir int) (bool, Cel
 	return false, cell
 }
 
-func solutionPart02(lines []string) {
-	var sum = int64(0)
-
-	fmt.Printf("%d", sum)
-}
-
 func isNeighborOfStartPoint(field [][]Cell, cell Cell) bool {
 
 	// finding horizontal neighbors
@@ -177,16 +171,13 @@ func isNeighborOfStartPoint(field [][]Cell, cell Cell) bool {
 	return false
 }
 
-func solutionPart01(lines []string) {
-	const SIZE = 200
-
-	var field = make([][]Cell, 0, SIZE)
-
+func readInputLines(lines []string) (int, int, [][]Cell) {
+	var field = make([][]Cell, 0)
 	var startRow = 0
 	var startCol = 0
 	var found = false
 	for r, line := range lines {
-		var fieldRow = make([]Cell, 0, SIZE)
+		var fieldRow = make([]Cell, 0)
 		for c := range line {
 			var cell = string(line[c])
 			fieldRow = append(fieldRow, Cell{cell, r, c})
@@ -199,6 +190,11 @@ func solutionPart01(lines []string) {
 		field = append(field, fieldRow)
 	}
 
+	return startRow, startCol, field
+}
+
+func findPaths(startRow int, startCol int, field [][]Cell) [][]Cell {
+
 	var startCell = field[startRow][startCol]
 	var cell = Cell{}
 	var path = make([]Cell, 0)
@@ -208,8 +204,7 @@ func solutionPart01(lines []string) {
 	var stack = Stack{}
 	stack.Push(startCell)
 
-	var iterMax = 1000000
-	for !stack.IsEmpty() && iterMax > 0 {
+	for !stack.IsEmpty() {
 		cell, _ = stack.Pop()
 		path = append(path, cell)
 		visited[cell.row][cell.column] = true
@@ -232,8 +227,14 @@ func solutionPart01(lines []string) {
 			visited[startCell.row][startCell.column] = true
 			continue
 		}
-		iterMax--
 	}
+
+	return paths
+}
+
+func solutionPart01(lines []string) {
+	var startRow, startCol, field = readInputLines(lines)
+	var paths = findPaths(startRow, startCol, field)
 
 	var max = 0
 	for i := range paths {
@@ -247,11 +248,97 @@ func solutionPart01(lines []string) {
 		}
 	}
 
-	if iterMax <= 0 {
-		panic("MAX ITERATION REACHED")
+	fmt.Printf("%d\n", max)
+}
+
+func printMatrix(visited [][]bool, visitedSymbol string) {
+	fmt.Printf("\n")
+	for i := 0; i < len(visited); i++ {
+		for j := 0; j < len(visited[i]); j++ {
+			if visited[i][j] == true {
+				fmt.Printf(visitedSymbol)
+			} else {
+				fmt.Printf("0")
+			}
+		}
+		fmt.Printf("\n")
+	}
+}
+
+func solutionPart02(lines []string) {
+	var startRow, startCol, field = readInputLines(lines)
+	var paths = findPaths(startRow, startCol, field)
+
+	var visited = makeBooleanMatrix(findMaxSizes(field))
+
+	for i := range paths {
+		for _, cell := range paths[i] {
+			visited[cell.row][cell.column] = true
+		}
 	}
 
-	fmt.Printf("%d\n", max)
+	var matrix = make([]string, 0)
+	for i := 0; i < len(visited); i++ {
+		var line = ""
+		for j := 0; j < len(visited[i]); j++ {
+			if visited[i][j] {
+				line += "1"
+			} else {
+				line += "0"
+			}
+		}
+		matrix = append(matrix, line)
+	}
+
+	printMatrix(visited, "1")
+
+	var count = 0
+	var matrix2 = make([]string, 0)
+	for _, matrixLine := range matrix {
+		var line = ""
+		for j := 0; j < len(matrixLine); j++ {
+			if string(matrixLine[j]) == "0" {
+				var index01 = findItemForward(matrixLine, "1", j+1)
+				var index02 = findItemBackward(matrixLine, "1", j-1)
+				if index01 >= 0 && index02 >= 0 {
+					line += "0"
+					count++
+				} else {
+					line += "1"
+				}
+			} else {
+				line += "1"
+			}
+		}
+		matrix2 = append(matrix2, line)
+	}
+
+	matrix = matrix2
+
+	fmt.Printf("\n")
+	for i := 0; i < len(matrix); i++ {
+		fmt.Printf("%s\n", matrix[i])
+	}
+
+	fmt.Printf("%d", count)
+}
+
+func findItemForward(line string, search string, fromIndex int) int {
+	for i := fromIndex; i < len(line); i++ {
+		if i >= 0 && i < len(line) && string(line[i]) == search {
+			return i
+		}
+	}
+	return -1
+}
+
+func findItemBackward(line string, search string, fromIndex int) int {
+	for i := fromIndex; i >= 0; i-- {
+		if i >= 0 && i < len(line) && string(line[i]) == search {
+			return i
+		}
+	}
+	return -1
 }
 
 // https://adventofcode.com/2023/day/10
@@ -262,6 +349,9 @@ func main() {
 	RunAdventOfCodeWithFile(solutionPart01, "day_10/testcases/input-part-01.txt")
 
 	// part 02: using string or input file
-	//RunAdventOfCodeWithString(solutionPart02, "")
+	//RunAdventOfCodeWithString(solutionPart02, ".F----7F7F7F7F-7....\n.|F--7||||||||FJ....\n.||.FJ||||||||L7....\nFJL7L7LJLJ||LJ.L-7..\nL--J.L7...LJS7F-7L7.\n....F-J..F7FJ|L7L7L7\n....L7.F7||L7|.L7L7|\n.....|FJLJ|FJ|F7|.LJ\n....FJL-7.||.||||...\n....L---J.LJ.LJLJ...")
+	//RunAdventOfCodeWithString(solutionPart02, "...........\n.S-------7.\n.|F-----7|.\n.||OOOOO||.\n.||OOOOO||.\n.|L-7OF-J|.\n.|II|O|II|.\n.L--JOL--J.\n.....O.....")
+	//RunAdventOfCodeWithString(solutionPart02, ".F----7F7F7F7F-7....\n.|F--7||||||||FJ....\n.||.FJ||||||||L7....\nFJL7L7LJLJ||LJ.L-7..\nL--J.L7...LJS7F-7L7.\n....F-J..F7FJ|L7L7L7\n....L7.F7||L7|.L7L7|\n.....|FJLJ|FJ|F7|.LJ\n....FJL-7.||.||||...\n....L---J.LJ.LJLJ...")
+	//RunAdventOfCodeWithString(solutionPart02, "FF7FSF7F7F7F7F7F---7\nL|LJ||||||||||||F--J\nFL-7LJLJ||||||LJL-77\nF--JF--7||LJLJIF7FJ-\nL---JF-JLJIIIIFJLJJ7\n|F|F-JF---7IIIL7L|7|\n|FFJF7L7F-JF7IIL---7\n7-L-JL7||F7|L7F-7F7|\nL.L7LFJ|||||FJL7||LJ\nL7JLJL-JLJLJL--JLJ.L")
 	//RunAdventOfCodeWithFile(solutionPart02, "day_10/testcases/input-part-02.txt")
 }

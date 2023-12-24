@@ -18,9 +18,9 @@ func fillMap(startIndex int, lines []string) []Data {
 	var i = startIndex + 1
 
 	for i < len(lines) && Trim(lines[i]) != "" {
-		var destRangeStart = SplitLongsGetAt(lines[i], " ", 0) // example 50
-		var srcRangeStart = SplitLongsGetAt(lines[i], " ", 1)  // example 98
-		var rangeDestSrc = SplitLongsGetAt(lines[i], " ", 2)   // example 2
+		var destRangeStart = SplitGetLongAt(lines[i], " ", 0) // example 50
+		var srcRangeStart = SplitGetLongAt(lines[i], " ", 1)  // example 98
+		var rangeDestSrc = SplitGetLongAt(lines[i], " ", 2)   // example 2
 		dataList = append(dataList, Data{destRangeStart, srcRangeStart, rangeDestSrc})
 		i++
 	}
@@ -118,27 +118,27 @@ func findLocation(catalog map[string][]Data, seed int64) int64 {
 func solutionPart01(lines []string) {
 	var seeds, catalog = readCatalog(lines)
 
-	var min = int64(0)
+	var minLoc = int64(0)
 	var firstTime = true
 	for _, seed := range seeds {
 		var location = findLocation(catalog, seed)
 
 		if firstTime {
-			min = location
+			minLoc = location
 			firstTime = false
-		} else if location < min {
-			min = location
+		} else if location < minLoc {
+			minLoc = location
 		}
 	}
 
-	fmt.Printf("%d", min)
+	fmt.Printf("%d", minLoc)
 }
 
 func solutionPart02(lines []string) {
 	var seeds, catalog = readCatalog(lines)
 
 	var i int64 = 0
-	var min = int64(0)
+	var minLoc = int64(0)
 	var firstTime = true
 
 	for i = 0; i < int64(len(seeds))-1; i = i + 2 {
@@ -146,24 +146,24 @@ func solutionPart02(lines []string) {
 			var location = findLocation(catalog, seed)
 
 			if firstTime {
-				min = location
+				minLoc = location
 				firstTime = false
-			} else if location < min {
-				min = location
+			} else if location < minLoc {
+				minLoc = location
 			}
 		}
 	}
 
-	fmt.Printf("%d", min)
+	fmt.Printf("%d", minLoc)
 }
 
 // https://adventofcode.com/2023/day/5
 func main() {
 	// part 01: using string or input file
 	//RunAdventOfCodeWithString(solutionPart01, "seeds: 79 14 55 13\n\nseed-to-soil map:\n50 98 2\n52 50 48\n\nsoil-to-fertilizer map:\n0 15 37\n37 52 2\n39 0 15\n\nfertilizer-to-water map:\n49 53 8\n0 11 42\n42 0 7\n57 7 4\n\nwater-to-light map:\n88 18 7\n18 25 70\n\nlight-to-temperature map:\n45 77 23\n81 45 19\n68 64 13\n\ntemperature-to-humidity map:\n0 69 1\n1 0 69\n\nhumidity-to-location map:\n60 56 37\n56 93 4")
-	//RunAdventOfCodeWithFile(solutionPart01, "day_05/testcases/input-part-01.txt")
+	RunAdventOfCodeWithFile(solutionPart01, "day_05/testcases/input-part-01.txt")
 
 	// part 02: using string or input file
 	//RunAdventOfCodeWithString(solutionPart02, "seeds: 79 14 55 13\n\nseed-to-soil map:\n50 98 2\n52 50 48\n\nsoil-to-fertilizer map:\n0 15 37\n37 52 2\n39 0 15\n\nfertilizer-to-water map:\n49 53 8\n0 11 42\n42 0 7\n57 7 4\n\nwater-to-light map:\n88 18 7\n18 25 70\n\nlight-to-temperature map:\n45 77 23\n81 45 19\n68 64 13\n\ntemperature-to-humidity map:\n0 69 1\n1 0 69\n\nhumidity-to-location map:\n60 56 37\n56 93 4")
-	RunAdventOfCodeWithFile(solutionPart02, "day_05/testcases/input-part-02.txt")
+	//RunAdventOfCodeWithFile(solutionPart02, "day_05/testcases/input-part-02.txt")
 }

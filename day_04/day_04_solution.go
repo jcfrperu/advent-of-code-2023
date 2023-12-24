@@ -32,7 +32,7 @@ func findAllCards(lines []string, findMatches bool) []Card {
 		if findMatches {
 			var matchesCount = 0
 			for _, winner := range card.winners {
-				var index = FindInListInt(card.myNumbers, winner)
+				var index = Find[int](card.myNumbers, winner)
 				if index >= 0 {
 					matchesCount++
 				}
@@ -51,7 +51,7 @@ func solutionPart01(lines []string) {
 		var count = 0
 		var firstMatch = true
 		for _, winner := range card.winners {
-			if FindInListInt(card.myNumbers, winner) >= 0 {
+			if Find[int](card.myNumbers, winner) >= 0 {
 				if firstMatch {
 					count = 1
 					firstMatch = false

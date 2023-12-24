@@ -117,6 +117,7 @@ func solutionPart01(lines []string) {
 
 	var sum = 0
 	for _, number := range numbers {
+		fmt.Printf("line: %d, number: %d, isAdjacent: %t\n", number.lineIndex, number.value, isNumberAdjacentToAnySymbol(number, symbols))
 		if isNumberAdjacentToAnySymbol(number, symbols) {
 			sum += number.value
 		}

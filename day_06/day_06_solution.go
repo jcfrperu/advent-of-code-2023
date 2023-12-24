@@ -47,9 +47,9 @@ func solutionPart02(lines []string) {
 func main() {
 	// part 01: using string or input file
 	//RunAdventOfCodeWithString(solutionPart01, "Time:      7  15   30\nDistance:  9  40  200")
-	//RunAdventOfCodeWithFile(solutionPart01, "day_06/testcases/input-part-01.txt")
+	RunAdventOfCodeWithFile(solutionPart01, "day_06/testcases/input-part-01.txt")
 
 	// part 02: using string or input file
 	//RunAdventOfCodeWithString(solutionPart02, "Time:      7  15   30\nDistance:  9  40  200")
-	RunAdventOfCodeWithFile(solutionPart02, "day_06/testcases/input-part-02.txt")
+	//RunAdventOfCodeWithFile(solutionPart02, "day_06/testcases/input-part-02.txt")
 }

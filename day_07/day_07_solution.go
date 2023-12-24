@@ -263,9 +263,9 @@ func solutionPart02(lines []string) {
 func main() {
 	// part 01: using string or input file
 	//RunAdventOfCodeWithString(solutionPart01, "32T3K 765\nT55J5 684\nKK677 28\nKTJJT 220\nQQQJA 483")
-	//RunAdventOfCodeWithFile(solutionPart01, "day_07/testcases/input-part-01.txt")
+	RunAdventOfCodeWithFile(solutionPart01, "day_07/testcases/input-part-01.txt")
 
 	// part 02: using string or input file
 	//RunAdventOfCodeWithString(solutionPart02, "32T3K 765\nT55J5 684\nKK677 28\nKTJJT 220\nQQQJA 483")
-	RunAdventOfCodeWithFile(solutionPart02, "day_07/testcases/input-part-02.txt") // 255086951 too high  254837398
+	//RunAdventOfCodeWithFile(solutionPart02, "day_07/testcases/input-part-02.txt") // 255086951 too high  254837398
 }

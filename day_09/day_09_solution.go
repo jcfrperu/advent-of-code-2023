@@ -87,9 +87,9 @@ func solutionPart02(lines []string) {
 func main() {
 	// part 01: using string or input file
 	//RunAdventOfCodeWithString(solutionPart01, "0 3 6 9 12 15\n1 3 6 10 15 21\n10 13 16 21 30 45")
-	//RunAdventOfCodeWithFile(solutionPart01, "day_09/testcases/input-part-01.txt")
+	RunAdventOfCodeWithFile(solutionPart01, "day_09/testcases/input-part-01.txt")
 
 	// part 02: using string or input file
 	//RunAdventOfCodeWithString(solutionPart02, "10  13  16  21  30  45")
-	RunAdventOfCodeWithFile(solutionPart02, "day_09/testcases/input-part-02.txt")
+	//RunAdventOfCodeWithFile(solutionPart02, "day_09/testcases/input-part-02.txt")
 }

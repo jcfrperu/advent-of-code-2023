@@ -99,8 +99,8 @@ func solutionPart02(lines []string) {
 // https://adventofcode.com/2023/day/1
 func main() {
 	// part 01: using string or input file
-	RunAdventOfCodeWithString(solutionPart01, "1abc2\npqr3stu8vwx\na1b2c3d4e5f\ntreb7uchet")
-	//RunAdventOfCodeWithFile(solutionPart01, "day_01/testcases/input-part-01.txt")
+	//RunAdventOfCodeWithString(solutionPart01, "1abc2\npqr3stu8vwx\na1b2c3d4e5f\ntreb7uchet")
+	RunAdventOfCodeWithFile(solutionPart01, "day_01/testcases/input-part-01.txt")
 
 	// part 02: using string or input file
 	//RunAdventOfCodeWithString(solutionPart02, "two1nine\neightwothree\nabcone2threexyz\nxtwone3four\n4nineeightseven2\nzoneight234\n7pqrstsixteen")
